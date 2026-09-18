@@ -1095,7 +1095,6 @@ function calcular(){
 
   const ibsPctC2 = receitaTotal !== 0 ? T2.ibsReg / receitaTotal : 0;
   const cbsPctC2 = receitaTotal !== 0 ? T2.cbsReg / receitaTotal : 0;
-  const deltaTotalC2vsC1 = c1_total !== 0 ? (c2_total_liquido - c1_total) / c1_total : 0;
 
   html += '<div class="section-title">4. Resumo Comparativo</div>';
   html += '<table class="plain resumo-table">';
@@ -1103,7 +1102,6 @@ function calcular(){
   html += '<tr><td class="first">Carga efetiva de CBS — Cenário 1 (embutido no Simples)</td><td>' + fmtPct(mediaCbsPct) + '</td></tr>';
   html += '<tr><td class="first">Carga efetiva de IBS — Cenário 2 (regime regular, líquida de créditos)</td><td>' + fmtPct(ibsPctC2) + '</td></tr>';
   html += '<tr><td class="first">Carga efetiva de CBS — Cenário 2 (regime regular, líquida de créditos)</td><td>' + fmtPct(cbsPctC2) + '</td></tr>';
-  html += '<tr class="total-row"><td class="first">Variação da carga tributária total — Cenário 2 em relação ao Cenário 1</td><td class="' + (deltaTotalC2vsC1>=0?'neg':'pos') + '">' + (deltaTotalC2vsC1>=0?'+':'') + fmtPct(deltaTotalC2vsC1) + '</td></tr>';
   html += '</table>';
   html += '<div class="note">Valores totais de referência: IBS Cenário 1 R$ ' + fmt(T1.ibs) + ' · CBS Cenário 1 R$ ' + fmt(T1.cbs) + ' · IBS Cenário 2 R$ ' + fmt(T2.ibsReg) + ' · CBS Cenário 2 R$ ' + fmt(T2.cbsReg) + ' · Carga tributária total Cenário 1 R$ ' + fmt(c1_total) + ' · Carga tributária total Cenário 2 (líquida de créditos) R$ ' + fmt(c2_total_liquido) + '.</div>';
   html += '<div class="note" style="margin-top:10px;">Simulação de referência gerencial. Alíquotas de CBS/IBS do regime regular ainda pendentes de fixação definitiva pelo Senado Federal. Reduções por CNAE são indicativas — confirme o enquadramento exato antes de aplicar.</div>';
@@ -1216,7 +1214,7 @@ function salvarArquivo(){
   let nome = (document.getElementById('razao').value || 'Cliente').trim();
   nome = nome.replace(/[^a-zA-Z0-9À-ÿ _-]/g, '').replace(/\s+/g, '_');
   if (!nome) nome = 'Cliente';
-  const filename = 'Simulador IBS CBS Simples Nacional - versão do cliente (' + nome + ').html';
+  const filename = 'Simulador IBS CBS Simples Nacional - uso do escritório (' + nome + ').html';
 
   let bootstrap = '\n';
   bootstrap += "document.getElementById('razao').value = " + JSON.stringify(document.getElementById('razao').value) + ";\n";
