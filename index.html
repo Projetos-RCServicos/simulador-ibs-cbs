@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
+<html lang="pt-BR"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Simulador de Tributação IBS/CBS — Simples Nacional</title>
@@ -206,7 +205,7 @@
   </div>
   <div class="header-text">
     <h1>Simulador de Tributação IBS/CBS — Simples Nacional</h1>
-    <p>Comparativo: situação atual (2026) &times; tributação embutida no DAS (2027/2028) &times; regime regular de IBS/CBS (fora do Simples)</p>
+    <p>Comparativo: situação atual (2026) × tributação embutida no DAS (2027/2028) × regime regular de IBS/CBS (fora do Simples)</p>
     <span class="legal-tag">Base legal: LC nº 123/2006 · LC nº 214/2025 · LC nº 227/2026</span>
   </div>
 </header>
@@ -224,7 +223,7 @@
   <div class="card">
   <div class="section-title" style="margin-top:0;">1. Identificação do Contribuinte e Parâmetros Gerais</div>
   <table class="plain">
-    <tr>
+    <tbody><tr>
       <td class="label" style="width:20%">Razão Social:</td>
       <td style="width:32%"><input type="text" id="razao" value="Empresa Exemplo LTDA"></td>
       <td class="label" style="width:12%">CNPJ:</td>
@@ -234,26 +233,36 @@
     </tr>
     <tr>
       <td class="label">RBT12 - Mercado Interno (R$):</td>
-      <td><input type="number" id="rbt12int" value="2594740.00" step="0.01"></td>
+      <td><input type="text" inputmode="decimal" id="rbt12int" value="R$ 2.594.740,00" oninput="maskMoedaInput(this)"></td>
       <td class="label">RBT12 - Mercado Externo (R$):</td>
-      <td colspan="3"><input type="number" id="rbt12ext" value="202851.06" step="0.01"></td>
+      <td colspan="3"><input type="text" inputmode="decimal" id="rbt12ext" value="R$ 202.851,06" oninput="maskMoedaInput(this)"></td>
     </tr>
     <tr>
       <td class="label">Folha de Salários 12 meses (R$) — opcional:</td>
-      <td><input type="number" id="folha12" value="948810.66" step="0.01"></td>
+      <td><input type="text" inputmode="decimal" id="folha12" value="R$ 948.810,66" oninput="maskMoedaInput(this)"></td>
       <td class="label">Fator R calculado:</td>
       <td colspan="3" id="fatorR" style="font-weight:bold;">—</td>
     </tr>
-  </table>
+  </tbody></table>
   <div class="note">O RBT12 é segregado por mercado (interno x externo), exatamente como no PGDAS-D real: cada atividade usa o RBT12 do seu próprio mercado para localizar a faixa e a alíquota nominal em seu Anexo. O CNAE Principal é informativo; cada atividade abaixo pode ter seu próprio CNAE para fins da crítica de enquadramento (item 2.2).</div>
 
   <div class="section-title">2. Parâmetros do Regime Regular / Transição 2027-2028 (editável)</div>
   <table class="plain">
-    <tr>
+    <tbody><tr>
       <td class="label" style="width:38%">Alíquota plena de CBS no regime regular (%):</td>
       <td style="width:12%"><input type="number" id="cbsRegular" value="8.80" step="0.01"></td>
-      <td class="label" style="width:38%">Alíquota de IBS 2027/2028 — Estados 0,05% + Municípios 0,05% (%):</td>
-      <td style="width:12%"><input type="number" id="ibsTransicao" value="0.10" step="0.01"></td>
+      <td class="label" style="width:38%">Alíquota de IBS no regime regular — componente Estadual (UF de destino da operação) (%):</td>
+      <td style="width:12%"><input type="number" id="ibsRegularEstadual" value="8.85" step="0.01" oninput="atualizaIbsRegularTotal()"></td>
+    </tr>
+    <tr>
+      <td class="label" colspan="2"></td>
+      <td class="label">Alíquota de IBS no regime regular — componente Municipal (Município de destino da operação) (%):</td>
+      <td><input type="number" id="ibsRegularMunicipal" value="8.85" step="0.01" oninput="atualizaIbsRegularTotal()"></td>
+    </tr>
+    <tr>
+      <td class="label" colspan="2"></td>
+      <td class="label">Alíquota efetiva de IBS no regime regular — Cenário 2 (calculada automaticamente pelo simulador: Estadual + Municipal):</td>
+      <td id="ibsRegularTotal" style="font-weight:bold;">17,70%</td>
     </tr>
     <tr>
       <td class="label">A Receita Bruta do Mês informada nas atividades já inclui CBS/IBS?</td>
@@ -264,18 +273,20 @@
         </select>
       </td>
     </tr>
-  </table>
+  </tbody></table>
   <div class="note">O IBS e a CBS incidem "por fora" no regime regular (art. 12, §2º, I, da LC nº 214/2025) — diferente do DAS do Simples, que incide "por dentro" da receita bruta. Esta opção define como a Receita Bruta do Mês de cada atividade deve ser tratada apenas para o cálculo de CBS/IBS no Cenário 2; os demais tributos (IRPJ, CSLL, CPP, ICMS/ISS, IPI) continuam calculados normalmente sobre a receita bruta informada, como sempre ocorreu no Simples.</div>
-  <div class="note">A alíquota de CBS do regime regular ainda não é definitiva (será fixada por Resolução do Senado Federal, art. 349 da LC nº 214/2025) — ajuste o valor conforme a legislação vigente na data da simulação.</div>
+  <div class="note">A alíquota de CBS do regime regular ainda não é definitiva (será fixada por Resolução do Senado Federal, art. 349 da LC nº 214/2025) — ajuste o valor conforme a legislação vigente na data da simulação. O mesmo vale para os componentes Estadual e Municipal do IBS do regime regular, cuja soma com a de CBS compõe a chamada "alíquota de referência" (ainda pendente de fixação definitiva pelo Senado Federal e pelos Estados/Municípios).</div>
+  <div class="note">Atenção: dentro do Simples Nacional (Cenário 1), o CBS e o IBS embutidos no DAS não são percentuais fixos digitados manualmente — são calculados pelo próprio simulador do mesmo jeito que os demais tributos (IRPJ, CSLL, CPP, ICMS/ISS): pela alíquota efetiva da faixa de RBT12, repartida pelos percentuais oficiais de partilha de cada Anexo, conforme os Anexos XVIII a XXII da LC nº 214/2025 (que atualizaram os Anexos I a V da LC nº 123/2006 para 2027/2028). Não há, portanto, distinção entre componente Estadual e Municipal do IBS dentro do Simples — a partilha já sai pronta da tabela. Essa distinção Estadual/Municipal só existe para o IBS apurado <b>fora</b> do Simples, no regime regular (Cenário 2): como cada Estado e cada Município fixa sua própria alíquota padrão de IBS, a alíquota efetivamente aplicável é a soma dessas duas alíquotas do local de destino da operação — por isso, no Cenário 2, o simulador soma automaticamente os dois componentes informados ao lado.</div>
+
 
   <div class="section-title">2.1 Tabela de Referência — Reduções de Alíquota de IBS/CBS por Setor/CNAE (regime regular)</div>
   <table class="ref">
-    <tr><th style="width:12%">Redução</th><th style="width:20%">Base Legal (LC nº 214/2025)</th><th>Setores / Exemplos de CNAE</th></tr>
+    <tbody><tr><th style="width:12%">Redução</th><th style="width:20%">Base Legal (LC nº 214/2025)</th><th>Setores / Exemplos de CNAE</th></tr>
     <tr><td style="text-align:center;font-weight:bold;">Alíquota Zero (100%)</td><td>Art. 125 (Anexo I) e arts. 144-146 e 157</td><td>Cesta básica nacional de alimentos (por NCM, não pelo CNAE inteiro); dispositivos médicos e de acessibilidade para pessoas com deficiência; transporte público coletivo urbano/metropolitano de passageiros (ex.: CNAE 4921-3, 4922-1)</td></tr>
     <tr><td style="text-align:center;font-weight:bold;">Redução de 60%</td><td>Art. 128</td><td>Serviços de saúde (CNAE 8610, 8630, 8650); serviços de educação (CNAE 8511 a 8542); dispositivos médicos e medicamentos; insumos e produtos agropecuários in natura (CNAE 01, 02, 03); produções artísticas, culturais, jornalísticas e audiovisuais (CNAE 59, 90)</td></tr>
     <tr><td style="text-align:center;font-weight:bold;">Redução de 30%</td><td>Art. 127</td><td>Serviços de profissões intelectuais regulamentadas, fiscalizadas por conselho profissional: contabilidade (CNAE 6920-6), advocacia (CNAE 6911-7), engenharia (CNAE 7112-0), arquitetura (CNAE 7111-1), entre outras</td></tr>
     <tr><td style="text-align:center;font-weight:bold;">Sem redução (padrão)</td><td>Alíquota de referência cheia</td><td>Comércio (Anexo I), indústria (Anexo II) e demais serviços não listados nos Anexos II a XIV da LC nº 214/2025</td></tr>
-  </table>
+  </tbody></table>
   <div class="note">Tabela indicativa e não exaustiva. As reduções de bens (cesta básica, medicamentos, dispositivos médicos) dependem da classificação NCM de cada item, não apenas do CNAE da empresa; confirme o enquadramento exato nos Anexos II a XIV da LC nº 214/2025 antes de aplicar. Os benefícios não se acumulam automaticamente — prevalece o de maior redução (LC nº 227/2026, art. 7º-A).</div>
 
   <div class="section-title">2.2 Discriminativo de Receitas por Atividade (mês de apuração)</div>
@@ -293,6 +304,13 @@
       </tr>
     </thead>
     <tbody id="linhasBody"></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="3" style="text-align:right;">Total da Receita Bruta do Mês:</td>
+        <td id="totalReceitaBrutaMes" style="text-align:right;">R$ 0,00</td>
+        <td colspan="4"></td>
+      </tr>
+    </tfoot>
   </table>
   <div style="margin-top:8px;"><button class="small" onclick="adicionarLinha()">+ Adicionar Atividade</button></div>
   <div class="note">Receitas de exportação são imunes a CBS, IBS, PIS, Cofins, ICMS e ISS e usam o RBT12 do Mercado Externo para sua própria faixa; IRPJ, CSLL, CPP e IPI continuam incidindo normalmente. O "Redutor IBS/CBS" é sugerido automaticamente a partir do CNAE informado (tabela 2.1) quando reconhecido, mas pode ser ajustado manualmente — ele só se aplica ao Cenário 2 (regime regular); dentro do Simples (Cenário 1), a alíquota já é a do próprio Anexo. O "Regime Especial" trata receitas de revenda de mercadorias sujeitas a substituição tributária/monofásico de ICMS e/ou a tributação concentrada (monofásica) de PIS/Cofins, cujo tributo já foi recolhido por terceiro em etapa anterior da cadeia — ver explicação e exemplos logo abaixo.</div>
@@ -319,12 +337,12 @@
       Tabelas vigentes utilizadas pelo simulador (conferidas em 24/08/2026):
     </div>
     <table class="ref" style="margin-top:2px;">
-      <tr><th>Faixa</th><th>RBT12 (R$)</th><th>Tabela I — Alíq./PD</th><th>Tabela II — Alíq./PD</th></tr>
+      <tbody><tr><th>Faixa</th><th>RBT12 (R$)</th><th>Tabela I — Alíq./PD</th><th>Tabela II — Alíq./PD</th></tr>
       <tr><td style="text-align:center;">1ª e 2ª</td><td style="text-align:center;">Até 360.000,00</td><td style="text-align:center;">Isenção</td><td style="text-align:center;">Isenção</td></tr>
       <tr><td style="text-align:center;">3ª</td><td style="text-align:center;">360.000,01 a 720.000,00</td><td style="text-align:center;">3,1825% / R$ 11.457,00</td><td style="text-align:center;">3,200% / R$ 11.520,00</td></tr>
       <tr><td style="text-align:center;">4ª</td><td style="text-align:center;">720.000,01 a 1.800.000,00</td><td style="text-align:center;">3,5845% / R$ 14.351,40</td><td style="text-align:center;">3,5840% / R$ 14.284,80</td></tr>
       <tr><td style="text-align:center;">5ª</td><td style="text-align:center;">1.800.000,01 a 3.600.000,00</td><td style="text-align:center;">4,7905% / R$ 36.059,40</td><td style="text-align:center;">4,7040% / R$ 34.444,80</td></tr>
-    </table>
+    </tbody></table>
     <div class="note" style="margin-top:6px;">
       A opção "Anexo III - Transporte (ICMS no lugar do ISS)" aplica-se às transportadoras optantes do Simples Nacional: os percentuais de repartição são os mesmos do Anexo III, mas o tributo atribuído ao Estado é o ICMS, não o ISS, já que o transporte intermunicipal e interestadual é fato gerador de ICMS (art. 155, II, CF/88), e não de ISS. A variante "com isenção/redução ICMS-PR" usa a mesma Tabela I acima (que já abrange comércio e transporte).
     </div>
@@ -349,6 +367,15 @@
       </tr>
     </thead>
     <tbody id="creditosBody"></tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td style="text-align:right;">Total dos Custos e Despesas Geradores de Créditos de IBS/CBS:</td>
+        <td id="totalCustosDespesas" style="text-align:right;">R$ 0,00</td>
+        <td id="totalCreditoCbsFooter" style="text-align:right;">R$ 0,00</td>
+        <td id="totalCreditoIbsFooter" style="text-align:right;">R$ 0,00</td>
+        <td></td>
+      </tr>
+    </tfoot>
   </table>
   <div style="margin-top:8px;"><button class="small" onclick="adicionarCredito()">+ Adicionar Custo/Despesa</button></div>
   <div class="note">Os créditos são estimados aplicando as mesmas alíquotas de CBS e IBS do regime regular (seção 2) sobre o valor de cada custo/despesa, presumindo que o fornecedor destacou o tributo integralmente (não cumulatividade plena — art. 47, LC nº 214/2025). Ajuste linha a linha se o fornecedor aplicar redução, imunidade ou for optante do Simples sem opção pelo regime regular.</div>
@@ -370,54 +397,58 @@
 
 <script>
 // ======= Tabelas 2027/2028 (com CBS e IBS) — Anexos I a V da LC nº 123/2006 =======
+// Percentuais de "cbs" e "ibs" conforme a partilha oficial de tributos no DAS para 2027/2028
+// (LC nº 214/2025: Anexo XVIII → Anexo I; Anexo XIX → Anexo II; Anexo XX → Anexo III;
+//  Anexo XXI → Anexo IV; Anexo XXII → Anexo V). Na 6ª faixa (sublimite), ICMS/ISS e IBS são
+// recolhidos fora do DAS (terc/ibs = 0), como já ocorre hoje com o ICMS/ISS dessa faixa.
 const TABELAS = {
   I: { label:'ICMS', nome:'Anexo I - Comércio', ipi:false, cpp:true, redistrib:false, faixas:[
-    {min:0,        max:180000,   aliq:0.040, pd:0,      irpj:0.055, csll:0.035, cbs:0.1533, cpp:0.415, terc:0.340},
-    {min:180000.01,max:360000,   aliq:0.073, pd:5940,   irpj:0.055, csll:0.035, cbs:0.1533, cpp:0.415, terc:0.340},
-    {min:360000.01,max:720000,   aliq:0.095, pd:13860,  irpj:0.055, csll:0.035, cbs:0.1533, cpp:0.420, terc:0.335},
-    {min:720000.01,max:1800000,  aliq:0.107, pd:22500,  irpj:0.055, csll:0.035, cbs:0.1533, cpp:0.420, terc:0.335},
-    {min:1800000.01,max:3600000, aliq:0.143, pd:87300,  irpj:0.055, csll:0.035, cbs:0.1533, cpp:0.420, terc:0.335},
-    {min:3600000.01,max:4800000, aliq:0.189, pd:378000, irpj:0.1358,csll:0.1006,cbs:0.3402, cpp:0.4234,terc:0}
+    {min:0,        max:180000,   aliq:0.040, pd:0,      irpj:0.055, csll:0.035, cbs:0.1533, ibs:0.0017, cpp:0.415, terc:0.340},
+    {min:180000.01,max:360000,   aliq:0.073, pd:5940,   irpj:0.055, csll:0.035, cbs:0.1533, ibs:0.0017, cpp:0.415, terc:0.340},
+    {min:360000.01,max:720000,   aliq:0.095, pd:13860,  irpj:0.055, csll:0.035, cbs:0.1533, ibs:0.0017, cpp:0.420, terc:0.335},
+    {min:720000.01,max:1800000,  aliq:0.107, pd:22500,  irpj:0.055, csll:0.035, cbs:0.1533, ibs:0.0017, cpp:0.420, terc:0.335},
+    {min:1800000.01,max:3600000, aliq:0.143, pd:87300,  irpj:0.055, csll:0.035, cbs:0.1533, ibs:0.0017, cpp:0.420, terc:0.335},
+    {min:3600000.01,max:4800000, aliq:0.189, pd:378000, irpj:0.1358,csll:0.1006,cbs:0.3402, ibs:0,      cpp:0.4234,terc:0}
   ]},
   II: { label:'ICMS', nome:'Anexo II - Indústria', ipi:true, cpp:true, redistrib:false, faixas:[
-    {min:0,        max:180000,   aliq:0.045, pd:0,      irpj:0.055, csll:0.035, cbs:0.1385, cpp:0.375, ipi:0.075, terc:0.320},
-    {min:180000.01,max:360000,   aliq:0.078, pd:5940,   irpj:0.055, csll:0.035, cbs:0.1385, cpp:0.375, ipi:0.075, terc:0.320},
-    {min:360000.01,max:720000,   aliq:0.100, pd:13860,  irpj:0.055, csll:0.035, cbs:0.1385, cpp:0.375, ipi:0.075, terc:0.320},
-    {min:720000.01,max:1800000,  aliq:0.112, pd:22500,  irpj:0.055, csll:0.035, cbs:0.1385, cpp:0.375, ipi:0.075, terc:0.320},
-    {min:1800000.01,max:3600000, aliq:0.147, pd:85500,  irpj:0.055, csll:0.035, cbs:0.1385, cpp:0.375, ipi:0.075, terc:0.320},
-    {min:3600000.01,max:4800000, aliq:0.299, pd:720000, irpj:0.0853,csll:0.0753,cbs:0.2522, cpp:0.2359,ipi:0.3513,terc:0}
+    {min:0,        max:180000,   aliq:0.045, pd:0,      irpj:0.055, csll:0.035, cbs:0.1385, ibs:0.0015, cpp:0.375, ipi:0.075, terc:0.320},
+    {min:180000.01,max:360000,   aliq:0.078, pd:5940,   irpj:0.055, csll:0.035, cbs:0.1385, ibs:0.0015, cpp:0.375, ipi:0.075, terc:0.320},
+    {min:360000.01,max:720000,   aliq:0.100, pd:13860,  irpj:0.055, csll:0.035, cbs:0.1385, ibs:0.0015, cpp:0.375, ipi:0.075, terc:0.320},
+    {min:720000.01,max:1800000,  aliq:0.112, pd:22500,  irpj:0.055, csll:0.035, cbs:0.1385, ibs:0.0015, cpp:0.375, ipi:0.075, terc:0.320},
+    {min:1800000.01,max:3600000, aliq:0.147, pd:85500,  irpj:0.055, csll:0.035, cbs:0.1385, ibs:0.0015, cpp:0.375, ipi:0.075, terc:0.320},
+    {min:3600000.01,max:4800000, aliq:0.299, pd:720000, irpj:0.0853,csll:0.0753,cbs:0.2522, ibs:0,      cpp:0.2359,ipi:0.3513,terc:0}
   ]},
-  III: { label:'ISS', nome:'Anexo III - Serviços (Fator R >= 28%)', ipi:false, cpp:true, redistrib:{irpj:0.06036,csll:0.05275,cbs:0.23260,cpp:0.65429}, faixas:[
-    {min:0,        max:180000,   aliq:0.060, pd:0,      irpj:0.040, csll:0.035, cbs:0.1543, cpp:0.434, terc:0.335},
-    {min:180000.01,max:360000,   aliq:0.112, pd:9360,   irpj:0.040, csll:0.035, cbs:0.1691, cpp:0.434, terc:0.320},
-    {min:360000.01,max:720000,   aliq:0.135, pd:17640,  irpj:0.040, csll:0.035, cbs:0.1641, cpp:0.434, terc:0.325},
-    {min:720000.01,max:1800000,  aliq:0.160, pd:35640,  irpj:0.040, csll:0.035, cbs:0.1641, cpp:0.434, terc:0.325},
-    {min:1800000.01,max:3600000, aliq:0.210, pd:125640, irpj:0.040, csll:0.035, cbs:0.1543, cpp:0.434, terc:0.335},
-    {min:3600000.01,max:4800000, aliq:0.329, pd:648000, irpj:0.3509,csll:0.1504,cbs:0.1929, cpp:0.3058,terc:0}
+  III: { label:'ISS', nome:'Anexo III - Serviços (Fator R >= 28%)', ipi:false, cpp:true, redistrib:{irpj:0.0602,csll:0.0526,cbs:0.2320,cpp:0.6526,ibs:0.0026}, faixas:[
+    {min:0,        max:180000,   aliq:0.060, pd:0,      irpj:0.040, csll:0.035, cbs:0.1543, ibs:0.0017, cpp:0.434, terc:0.335},
+    {min:180000.01,max:360000,   aliq:0.112, pd:9360,   irpj:0.040, csll:0.035, cbs:0.1691, ibs:0.0019, cpp:0.434, terc:0.320},
+    {min:360000.01,max:720000,   aliq:0.135, pd:17640,  irpj:0.040, csll:0.035, cbs:0.1641, ibs:0.0019, cpp:0.434, terc:0.325},
+    {min:720000.01,max:1800000,  aliq:0.160, pd:35640,  irpj:0.040, csll:0.035, cbs:0.1641, ibs:0.0019, cpp:0.434, terc:0.325},
+    {min:1800000.01,max:3600000, aliq:0.210, pd:125640, irpj:0.040, csll:0.035, cbs:0.1543, ibs:0.0017, cpp:0.434, terc:0.335},
+    {min:3600000.01,max:4800000, aliq:0.329, pd:648000, irpj:0.3509,csll:0.1504,cbs:0.1929, ibs:0,      cpp:0.3058,terc:0}
   ]},
-  IV: { label:'ISS', nome:'Anexo IV - Serviços (CPP fora do DAS)', ipi:false, cpp:false, redistrib:{irpj:0.31455,csll:0.32129,cbs:0.36416,cpp:0}, faixas:[
-    {min:0,        max:180000,   aliq:0.045, pd:0,      irpj:0.188, csll:0.152, cbs:0.2126, terc:0.445},
-    {min:180000.01,max:360000,   aliq:0.090, pd:8100,   irpj:0.198, csll:0.152, cbs:0.2473, terc:0.400},
-    {min:360000.01,max:720000,   aliq:0.102, pd:12420,  irpj:0.208, csll:0.152, cbs:0.2374, terc:0.400},
-    {min:720000.01,max:1800000,  aliq:0.140, pd:39780,  irpj:0.178, csll:0.192, cbs:0.2275, terc:0.400},
-    {min:1800000.01,max:3600000, aliq:0.220, pd:183780, irpj:0.188, csll:0.192, cbs:0.2176, terc:0.400},
-    {min:3600000.01,max:4800000, aliq:0.329, pd:828000, irpj:0.5371,csll:0.2159,cbs:0.2470, terc:0}
+  IV: { label:'ISS', nome:'Anexo IV - Serviços (CPP fora do DAS)', ipi:false, cpp:false, redistrib:{irpj:0.3133,csll:0.3200,cbs:0.3627,cpp:0,ibs:0.0040}, faixas:[
+    {min:0,        max:180000,   aliq:0.045, pd:0,      irpj:0.188, csll:0.152, cbs:0.2126, ibs:0.0024, terc:0.445},
+    {min:180000.01,max:360000,   aliq:0.090, pd:8100,   irpj:0.198, csll:0.152, cbs:0.2473, ibs:0.0027, terc:0.400},
+    {min:360000.01,max:720000,   aliq:0.102, pd:12420,  irpj:0.208, csll:0.152, cbs:0.2374, ibs:0.0026, terc:0.400},
+    {min:720000.01,max:1800000,  aliq:0.140, pd:39780,  irpj:0.178, csll:0.192, cbs:0.2275, ibs:0.0025, terc:0.400},
+    {min:1800000.01,max:3600000, aliq:0.220, pd:183780, irpj:0.188, csll:0.192, cbs:0.2176, ibs:0.0024, terc:0.400},
+    {min:3600000.01,max:4800000, aliq:0.329, pd:828000, irpj:0.5371,csll:0.2159,cbs:0.2470, ibs:0,      terc:0}
   ]},
   V: { label:'ISS', nome:'Anexo V - Serviços (Fator R < 28%)', ipi:false, cpp:true, redistrib:false, faixas:[
-    {min:0,        max:180000,   aliq:0.155, pd:0,      irpj:0.250, csll:0.150, cbs:0.1696, cpp:0.2885, terc:0.140},
-    {min:180000.01,max:360000,   aliq:0.180, pd:4500,   irpj:0.230, csll:0.150, cbs:0.1696, cpp:0.2785, terc:0.170},
-    {min:360000.01,max:720000,   aliq:0.195, pd:9900,   irpj:0.240, csll:0.150, cbs:0.1795, cpp:0.2385, terc:0.190},
-    {min:720000.01,max:1800000,  aliq:0.205, pd:17100,  irpj:0.210, csll:0.150, cbs:0.1894, cpp:0.2385, terc:0.210},
-    {min:1800000.01,max:3600000, aliq:0.230, pd:62100,  irpj:0.230, csll:0.125, cbs:0.1696, cpp:0.2385, terc:0.235},
-    {min:3600000.01,max:4800000, aliq:0.304, pd:540000, irpj:0.351, csll:0.1554,cbs:0.1978, cpp:0.2958,terc:0}
+    {min:0,        max:180000,   aliq:0.155, pd:0,      irpj:0.250, csll:0.150, cbs:0.1696, ibs:0.0019, cpp:0.2885, terc:0.140},
+    {min:180000.01,max:360000,   aliq:0.180, pd:4500,   irpj:0.230, csll:0.150, cbs:0.1696, ibs:0.0019, cpp:0.2785, terc:0.170},
+    {min:360000.01,max:720000,   aliq:0.195, pd:9900,   irpj:0.240, csll:0.150, cbs:0.1795, ibs:0.0020, cpp:0.2385, terc:0.190},
+    {min:720000.01,max:1800000,  aliq:0.205, pd:17100,  irpj:0.210, csll:0.150, cbs:0.1894, ibs:0.0021, cpp:0.2385, terc:0.210},
+    {min:1800000.01,max:3600000, aliq:0.230, pd:62100,  irpj:0.230, csll:0.125, cbs:0.1696, ibs:0.0019, cpp:0.2385, terc:0.235},
+    {min:3600000.01,max:4800000, aliq:0.304, pd:540000, irpj:0.351, csll:0.1554,cbs:0.1978, ibs:0,      cpp:0.2958,terc:0}
   ]},
-  IIIT: { label:'ICMS', nome:'Anexo III - Transporte (ICMS no lugar do ISS)', ipi:false, cpp:true, redistrib:{irpj:0.06036,csll:0.05275,cbs:0.23260,cpp:0.65429}, faixas:[
-    {min:0,        max:180000,   aliq:0.060, pd:0,      irpj:0.040, csll:0.035, cbs:0.1543, cpp:0.434, terc:0.335},
-    {min:180000.01,max:360000,   aliq:0.112, pd:9360,   irpj:0.040, csll:0.035, cbs:0.1691, cpp:0.434, terc:0.320},
-    {min:360000.01,max:720000,   aliq:0.135, pd:17640,  irpj:0.040, csll:0.035, cbs:0.1641, cpp:0.434, terc:0.325},
-    {min:720000.01,max:1800000,  aliq:0.160, pd:35640,  irpj:0.040, csll:0.035, cbs:0.1641, cpp:0.434, terc:0.325},
-    {min:1800000.01,max:3600000, aliq:0.210, pd:125640, irpj:0.040, csll:0.035, cbs:0.1543, cpp:0.434, terc:0.335},
-    {min:3600000.01,max:4800000, aliq:0.329, pd:648000, irpj:0.3509,csll:0.1504,cbs:0.1929, cpp:0.3058,terc:0}
+  IIIT: { label:'ICMS', nome:'Anexo III - Transporte (ICMS no lugar do ISS)', ipi:false, cpp:true, redistrib:{irpj:0.0602,csll:0.0526,cbs:0.2320,cpp:0.6526,ibs:0.0026}, faixas:[
+    {min:0,        max:180000,   aliq:0.060, pd:0,      irpj:0.040, csll:0.035, cbs:0.1543, ibs:0.0017, cpp:0.434, terc:0.335},
+    {min:180000.01,max:360000,   aliq:0.112, pd:9360,   irpj:0.040, csll:0.035, cbs:0.1691, ibs:0.0019, cpp:0.434, terc:0.320},
+    {min:360000.01,max:720000,   aliq:0.135, pd:17640,  irpj:0.040, csll:0.035, cbs:0.1641, ibs:0.0019, cpp:0.434, terc:0.325},
+    {min:720000.01,max:1800000,  aliq:0.160, pd:35640,  irpj:0.040, csll:0.035, cbs:0.1641, ibs:0.0019, cpp:0.434, terc:0.325},
+    {min:1800000.01,max:3600000, aliq:0.210, pd:125640, irpj:0.040, csll:0.035, cbs:0.1543, ibs:0.0017, cpp:0.434, terc:0.335},
+    {min:3600000.01,max:4800000, aliq:0.329, pd:648000, irpj:0.3509,csll:0.1504,cbs:0.1929, ibs:0,      cpp:0.3058,terc:0}
   ]}
 };
 // Anexos I, II e III-Transporte tem variante "com isencao/reducao de ICMS-PR" (mesmas faixas/percentuais - PR_TABELAS reaproveita TABELAS)
@@ -526,6 +557,30 @@ function fmt(v){
 function fmtPct(v){
   return (v*100).toLocaleString('pt-BR', {minimumFractionDigits:4, maximumFractionDigits:4}) + '%';
 }
+// ======= Máscara de valores monetários (R$) para os campos editáveis =======
+function fmtMoeda(v){
+  return 'R$ ' + fmt(Number(v) || 0);
+}
+// Converte qualquer texto digitado/formatado (ex.: "R$ 1.234,56") de volta para número.
+// Trabalha só com os dígitos, tratando sempre os 2 últimos como centavos (espelha maskMoedaInput).
+function parseMoeda(str){
+  if (str == null) return 0;
+  const digits = String(str).replace(/\D/g, '');
+  if (digits === '') return 0;
+  return parseInt(digits, 10) / 100;
+}
+// Reformata o campo a cada tecla digitada, no padrão R$ 1.234,56 (mesmo estilo dos campos de resultado)
+function maskMoedaInput(el){
+  let digits = el.value.replace(/\D/g, '').replace(/^0+/, '');
+  if (digits === ''){
+    el.value = '';
+    return;
+  }
+  if (digits.length < 3) digits = digits.padStart(3, '0');
+  const cents = digits.slice(-2);
+  const intPart = digits.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  el.value = 'R$ ' + intPart + ',' + cents;
+}
 
 function adicionarLinha(desc, cnae, anexo, receita, exportacao, redutor, regimeEspecial){
   linhaSeq++;
@@ -541,12 +596,13 @@ function adicionarLinha(desc, cnae, anexo, receita, exportacao, redutor, regimeE
       '<option value="II">Anexo II - Indústria</option>' +
       '<option value="II_PR">Anexo II com isenção/redução ICMS-PR</option>' +
       '<option value="III">Anexo III - Serviços (Fator R >= 28%)</option>' +
+      '<option value="III_NFR">Anexo III - serviços não sujeitos ao fator R</option>' +
       '<option value="IIIT">Anexo III - Transporte (ICMS no lugar do ISS)</option>' +
       '<option value="IIIT_PR">Anexo III - Transporte com isenção/redução ICMS-PR</option>' +
       '<option value="IV">Anexo IV - Serviços (CPP fora do DAS)</option>' +
       '<option value="V">Anexo V - Serviços (Fator R < 28%)</option>' +
     '</select></td>' +
-    '<td><input type="number" class="l-receita" value="' + (receita != null ? receita : '') + '" step="0.01"></td>' +
+    '<td><input type="text" inputmode="decimal" class="l-receita" value="' + (receita != null ? fmtMoeda(receita) : '') + '" oninput="maskMoedaInput(this)"></td>' +
     '<td><select class="l-exp"><option value="Nao">Não</option><option value="Sim">Sim</option></select></td>' +
     '<td><select class="l-redutor"><option value="0">Sem redução (0%)</option><option value="0.3">30%</option><option value="0.6">60%</option><option value="1">100%</option></select></td>' +
     '<td><select class="l-regime">' +
@@ -584,7 +640,7 @@ function adicionarCredito(desc, valor){
   tr.id = id;
   tr.innerHTML =
     '<td><input type="text" class="c-desc" value="' + (desc || '') + '"></td>' +
-    '<td><input type="number" class="c-valor" value="' + (valor != null ? valor : 0) + '" step="0.01"></td>' +
+    '<td><input type="text" inputmode="decimal" class="c-valor" value="' + fmtMoeda(valor != null ? valor : 0) + '" oninput="maskMoedaInput(this)"></td>' +
     '<td class="c-cbs" style="text-align:right;">R$ 0,00</td>' +
     '<td class="c-ibs" style="text-align:right;">R$ 0,00</td>' +
     '<td style="text-align:center;"><button class="rm" onclick="removerCredito(\'' + id + '\')">X</button></td>';
@@ -600,8 +656,8 @@ document.getElementById('rbt12int').addEventListener('input', atualizaFatorR);
 document.getElementById('rbt12ext').addEventListener('input', atualizaFatorR);
 document.getElementById('folha12').addEventListener('input', atualizaFatorR);
 function atualizaFatorR(){
-  const rbt12 = (parseFloat(document.getElementById('rbt12int').value) || 0) + (parseFloat(document.getElementById('rbt12ext').value) || 0);
-  const folha = parseFloat(document.getElementById('folha12').value) || 0;
+  const rbt12 = parseMoeda(document.getElementById('rbt12int').value) + parseMoeda(document.getElementById('rbt12ext').value);
+  const folha = parseMoeda(document.getElementById('folha12').value);
   const el = document.getElementById('fatorR');
   if (rbt12 > 0 && folha >= 0){
     const fr = folha / rbt12;
@@ -609,6 +665,19 @@ function atualizaFatorR(){
   } else {
     el.textContent = '—';
   }
+}
+
+document.getElementById('ibsRegularEstadual').addEventListener('input', atualizaIbsRegularTotal);
+document.getElementById('ibsRegularMunicipal').addEventListener('input', atualizaIbsRegularTotal);
+function atualizaIbsRegularTotal(){
+  // Alíquota efetiva de IBS no regime regular (Cenário 2) = soma da alíquota padrão do Estado
+  // de destino com a do Município de destino (cada ente fixa a sua própria — art. 156-A, CF/88,
+  // e LC nº 214/2025) — calculada aqui, nunca digitada diretamente.
+  const estadual = parseFloat(document.getElementById('ibsRegularEstadual').value) || 0;
+  const municipal = parseFloat(document.getElementById('ibsRegularMunicipal').value) || 0;
+  const total = estadual + municipal;
+  const el = document.getElementById('ibsRegularTotal');
+  if (el) el.textContent = total.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '%';
 }
 
 // Tabela oficial do ICMS-PR (Tabelas I e II, Anexo XI do RICMS/PR - conferida em 24/08/2026)
@@ -649,16 +718,17 @@ function getFaixa(rbt12, anexo, tabelas){
   return null;
 }
 
-// resolve a chave real da tabela (remove sufixo _PR) e se a linha esta sujeita a isencao/reducao ICMS-PR
+// resolve a chave real da tabela (remove sufixo _PR, normaliza III_NFR para III) e se a linha esta sujeita a isencao/reducao ICMS-PR
 function resolveAnexo(anexo){
   const isPr = anexo.endsWith('_PR');
-  const tabelaKey = isPr ? anexo.slice(0, -3) : anexo;
+  let tabelaKey = isPr ? anexo.slice(0, -3) : anexo;
+  if (tabelaKey === 'III_NFR') tabelaKey = 'III';
   return { tabelaKey, isPr };
 }
 
 function calcularComponentes(anexoSel, rbt12Linha, exportacao, regimeEspecial){
   const { tabelaKey, isPr } = resolveAnexo(anexoSel);
-  const tab = TABELAS[tabelaKey];
+  const tab = (anexoSel === 'III_NFR') ? Object.assign({}, TABELAS[tabelaKey], { nome: 'Anexo III - Serviços não sujeitos ao Fator R' }) : TABELAS[tabelaKey];
   const f = getFaixa(rbt12Linha, tabelaKey, TABELAS);
   if (!f) return null;
   const faixaIdx = tab.faixas.indexOf(f) + 1;
@@ -667,6 +737,7 @@ function calcularComponentes(anexoSel, rbt12Linha, exportacao, regimeEspecial){
   let irpj = aliqEfetiva * f.irpj;
   let csll = aliqEfetiva * f.csll;
   let cbs  = aliqEfetiva * f.cbs;
+  let ibs  = aliqEfetiva * (f.ibs || 0);
   let cpp  = (tab.cpp && f.cpp !== undefined) ? aliqEfetiva * f.cpp : 0;
   let ipi  = tab.ipi ? aliqEfetiva * f.ipi : 0;
   let terc = aliqEfetiva * f.terc;
@@ -680,29 +751,32 @@ function calcularComponentes(anexoSel, rbt12Linha, exportacao, regimeEspecial){
     icmsPrNote = (exportacao === 'Sim') ? '' : (rbt12Linha <= 360000
       ? 'ICMS isento (RBT12 até R$ 360.000,00 — art. 3º, Anexo XI, RICMS/PR).'
       : 'ICMS calculado pela Tabela ' + tabelaPRKey + ' do Anexo XI do RICMS/PR (alíquota efetiva ' + fmtPct(terc) + ').');
-  } else if (tab.redistrib && terc > 0.05 && exportacao !== 'Sim'){
+  } else if (tab.redistrib && terc > 0.05 && exportacao !== 'Sim' && regimeEspecial !== 'icms' && regimeEspecial !== 'both'){
     const excedente = terc - 0.05;
     terc = 0.05;
     const rd = tab.redistrib;
     irpj += excedente * rd.irpj;
     csll += excedente * rd.csll;
     cbs  += excedente * rd.cbs;
+    ibs  += excedente * (rd.ibs || 0);
     if (tab.cpp) cpp += excedente * rd.cpp;
-    redistribNote = 'O percentual de ' + tab.label + ' excedeu 5% da receita; o excedente (' + fmtPct(excedente) + ') foi redistribuído entre IRPJ, CSLL, CBS' + (tab.cpp ? ' e CPP' : '') + '.';
+    redistribNote = 'O percentual de ' + tab.label + ' excedeu 5% da receita; o excedente (' + fmtPct(excedente) + ') foi redistribuído entre IRPJ, CSLL, CBS, IBS' + (tab.cpp ? ' e CPP' : '') + '.';
   }
 
   if (exportacao === 'Sim'){
     cbs = 0;
+    ibs = 0;
     terc = 0;
   }
   if (regimeEspecial === 'icms' || regimeEspecial === 'both'){
     terc = 0; // ICMS-ST/monofasico: ICMS ja recolhido por terceiro
+    ibs = 0;  // IBS embutido no Simples substitui o ICMS/ISS; se este ja foi retido por terceiro, o IBS tambem nao e devido nesta apuracao
   }
   if (regimeEspecial === 'piscofins' || regimeEspecial === 'both'){
     cbs = 0; // PIS/Cofins monofasico (CBS): tributo ja recolhido por terceiro
   }
 
-  return { tab, f, faixaIdx, aliqEfetiva, irpj, csll, cbs, cpp, ipi, terc, redistribNote, icmsPrNote };
+  return { tab, f, faixaIdx, aliqEfetiva, irpj, csll, cbs, ibs, cpp, ipi, terc, redistribNote, icmsPrNote };
 }
 
 function calcularComponentes2026(anexoSel, rbt12Linha, exportacao, regimeEspecial){
@@ -724,7 +798,7 @@ function calcularComponentes2026(anexoSel, rbt12Linha, exportacao, regimeEspecia
   if (isPr){
     const tabelaPRKey = (tabelaKey === 'II') ? 'II' : 'I';
     terc = (exportacao === 'Sim') ? 0 : calcularICMSPR(tabelaPRKey, rbt12Linha);
-  } else if (tab.redistrib && terc > 0.05 && exportacao !== 'Sim'){
+  } else if (tab.redistrib && terc > 0.05 && exportacao !== 'Sim' && regimeEspecial !== 'icms' && regimeEspecial !== 'both'){
     const excedente = terc - 0.05;
     terc = 0.05;
     const rd = tab.redistrib;
@@ -754,27 +828,30 @@ function calcularComponentes2026(anexoSel, rbt12Linha, exportacao, regimeEspecia
 
 
 function calcular(){
-  const rbt12int = parseFloat(document.getElementById('rbt12int').value) || 0;
-  const rbt12ext = parseFloat(document.getElementById('rbt12ext').value) || 0;
+  const rbt12int = parseMoeda(document.getElementById('rbt12int').value);
+  const rbt12ext = parseMoeda(document.getElementById('rbt12ext').value);
   const cbsRegularRate = (parseFloat(document.getElementById('cbsRegular').value) || 0) / 100;
-  const ibsTransRate = (parseFloat(document.getElementById('ibsTransicao').value) || 0) / 100;
+  const ibsRegularRate = ((parseFloat(document.getElementById('ibsRegularEstadual').value) || 0) + (parseFloat(document.getElementById('ibsRegularMunicipal').value) || 0)) / 100;
   const receitaComTributo = document.getElementById('receitaComTributo').value === 'Sim';
   const resEl = document.getElementById('resultado');
   const criticaEl = document.getElementById('criticaAnexo');
 
   const rbt12Total = rbt12int + rbt12ext;
-  const folha = parseFloat(document.getElementById('folha12').value) || 0;
+  const folha = parseMoeda(document.getElementById('folha12').value);
   const fatorRAtual = rbt12Total > 0 ? folha / rbt12Total : 0;
 
   const linhas = Array.from(document.querySelectorAll('#linhasBody tr')).map(tr => ({
     desc: tr.querySelector('.l-desc').value || '(sem descrição)',
     cnae: tr.querySelector('.l-cnae').value,
     anexo: tr.querySelector('.l-anexo').value,
-    receita: parseFloat(tr.querySelector('.l-receita').value) || 0,
+    receita: parseMoeda(tr.querySelector('.l-receita').value),
     exportacao: tr.querySelector('.l-exp').value,
     redutor: parseFloat(tr.querySelector('.l-redutor').value) || 0,
     regimeEspecial: tr.querySelector('.l-regime').value
   })).filter(l => l.receita > 0);
+
+  const totalReceitaEl = document.getElementById('totalReceitaBrutaMes');
+  if (totalReceitaEl) totalReceitaEl.textContent = 'R$ ' + fmt(linhas.reduce((s, l) => s + l.receita, 0));
 
   if (linhas.length === 0){
     resEl.innerHTML = '<div class="box warn">Informe ao menos uma atividade com Receita Bruta do Mês maior que zero.</div>';
@@ -787,7 +864,8 @@ function calcular(){
     const cnae = normCnae(l.cnae);
     const esperado = CNAE_ANEXO[cnae];
     if (!esperado) return;
-    const anexoBase = l.anexo.endsWith('_PR') ? l.anexo.slice(0, -3) : l.anexo;
+    let anexoBase = l.anexo.endsWith('_PR') ? l.anexo.slice(0, -3) : l.anexo;
+    if (anexoBase === 'III_NFR') anexoBase = 'III'; // variante "nao sujeito ao fator R" usa a mesma tabela do Anexo III
     const anexoComparavel = (anexoBase === 'IIIT') ? 'III' : anexoBase; // transportadoras tambem contam como III para fins de critica de CNAE
     let ok = true;
     if (esperado === 'III_FIXO' && anexoComparavel !== 'III') ok = false;
@@ -821,7 +899,7 @@ function calcular(){
 
   linhas.forEach(l => {
     const isExp = l.exportacao === 'Sim';
-    const rbt12Linha = isExp ? rbt12ext : rbt12int;
+    const rbt12Linha = rbt12Total; // RBT12 (faixa/alíquota efetiva) é sempre o total da empresa (mercado interno + externo) — a segregação por mercado não altera a faixa
     const comp = calcularComponentes(l.anexo, rbt12Linha, l.exportacao, l.regimeEspecial);
     const comp26 = calcularComponentes2026(l.anexo, rbt12Linha, l.exportacao, l.regimeEspecial);
     if (!comp || !comp26){
@@ -854,7 +932,7 @@ function calcular(){
       desc: l.desc,
       anexoNome: comp.tab.nome,
       cbsPct: comp.cbs,
-      ibsPct: (isExp || icmsMono) ? 0 : ibsTransRate,
+      ibsPct: comp.ibs,
       isExp: isExp
     });
 
@@ -872,36 +950,31 @@ function calcular(){
     T1.cpp  += l.receita * comp.cpp;
     T1.ipi  += l.receita * comp.ipi;
     T1.terc += l.receita * comp.terc;
-    T1.ibs  += (isExp || icmsMono) ? 0 : l.receita * ibsTransRate;
+    T1.ibs  += l.receita * comp.ibs;
 
     T2.irpj += l.receita * comp.irpj;
     T2.csll += l.receita * comp.csll;
     T2.cpp  += l.receita * comp.cpp;
     T2.ipi  += l.receita * comp.ipi;
     T2.terc += l.receita * comp.terc;
-    if (isExp){
-      T2.precoFinal += l.receita; // exportacao: imune, preco final = receita, sem CBS/IBS
-    } else {
+    if (!isExp){
       const cbsRateLinha = pisCofinsMono ? 0 : cbsRegularRate * (1 - l.redutor);
-      const ibsRateLinha = icmsMono ? 0 : ibsTransRate * (1 - l.redutor);
+      const ibsRateLinha = icmsMono ? 0 : ibsRegularRate * (1 - l.redutor);
       const somaAliq = cbsRateLinha + ibsRateLinha;
-      let baseCalc, cbsLinha, ibsLinha, precoFinalLinha;
+      let baseCalc, cbsLinha, ibsLinha;
       if (receitaComTributo){
-        // receita ja inclui CBS/IBS: extrai o tributo de dentro do valor informado (mesmo preco final)
+        // receita ja inclui CBS/IBS: extrai o tributo de dentro do valor informado
         baseCalc = somaAliq > 0 ? l.receita / (1 + somaAliq) : l.receita;
         cbsLinha = baseCalc * cbsRateLinha;
         ibsLinha = baseCalc * ibsRateLinha;
-        precoFinalLinha = l.receita;
       } else {
         // receita e valor liquido: CBS/IBS somado por fora
         baseCalc = l.receita;
         cbsLinha = l.receita * cbsRateLinha;
         ibsLinha = l.receita * ibsRateLinha;
-        precoFinalLinha = l.receita + cbsLinha + ibsLinha;
       }
       T2.cbsReg += cbsLinha;
       T2.ibsReg += ibsLinha;
-      T2.precoFinal += precoFinalLinha;
     }
   });
 
@@ -921,6 +994,7 @@ function calcular(){
   const c2_dasAjustado = T2.irpj + T2.csll + T2.cpp + T2.ipi + T2.terc;
   const c2_total_bruto = c2_dasAjustado + T2.cbsReg + T2.ibsReg;
   const c2_credito = T2.cbsReg + T2.ibsReg;
+  T2.precoFinal = receitaTotal + T2.cbsReg + T2.ibsReg;
 
   html += '<div class="cenario-head">QUADRO 2026 &mdash; Situação Atual do Simples Nacional (sem CBS/IBS)</div>';
   html += '<table class="grid"><tr><th style="text-align:left;">Tributo (totais do período)</th><th>Valor (R$)</th></tr>';
@@ -976,27 +1050,34 @@ function calcular(){
   html += '<tr><td class="first">CBS — regime regular (débito bruto, já com redutor por CNAE)</td><td>R$ ' + fmt(T2.cbsReg) + '</td></tr>';
   html += '<tr><td class="first">IBS — regime regular (débito bruto, já com redutor por CNAE)</td><td>R$ ' + fmt(T2.ibsReg) + '</td></tr>';
   html += '<tr class="total-row"><td class="first">TOTAL (Cenário 2, antes dos créditos de insumos)</td><td>R$ ' + fmt(c2_total_bruto) + '</td></tr>';
-  html += '<tr><td class="first">Preço final efetivamente cobrado do cliente</td><td>R$ ' + fmt(T2.precoFinal) + '</td></tr>';
+  html += '<tr><td class="first">Preço final efetivamente cobrado do cliente (Receita Bruta do Mês + IBS + CBS)</td><td>R$ ' + fmt(T2.precoFinal) + '</td></tr>';
+  html += '<tr class="total-row"><td class="first">Valor a ser recebido pela empresa (Preço final &minus; IBS/CBS)</td><td>R$ ' + fmt(T2.precoFinal - c2_credito) + '</td></tr>';
   html += '</table>';
   html += '<div class="note">' + (receitaComTributo
-    ? 'Modo "receita já inclui CBS/IBS": o preço final cobrado do cliente permanece igual à Receita Bruta do Mês informada; o CBS/IBS foi extraído de dentro desse valor (base líquida = Receita ÷ (1 + alíquota)).'
-    : 'Modo "receita líquida": o CBS/IBS foi somado por fora da Receita Bruta do Mês informada; o preço final cobrado do cliente é maior que a receita líquida original.') + '</div>';
+    ? 'Modo "receita já inclui CBS/IBS": a Receita Bruta do Mês informada é tratada como o preço "por dentro" já praticado hoje; o CBS/IBS do regime regular foi extraído de dentro desse valor (base líquida = Receita ÷ (1 + alíquota)) para compor o preço final, somado à receita informada.'
+    : 'Modo "receita líquida": o CBS/IBS foi somado por fora da Receita Bruta do Mês informada para compor o preço final cobrado do cliente.') + '</div>';
   html += '<div class="box"><b>Crédito PLENO de IBS/CBS transferível ao adquirente PJ (débito bruto, Cenário 2): R$ ' + fmt(c2_credito) + '</b></div>';
 
   const creditos = Array.from(document.querySelectorAll('#creditosBody tr')).map(tr => ({
     desc: tr.querySelector('.c-desc').value || '(sem descrição)',
-    valor: parseFloat(tr.querySelector('.c-valor').value) || 0,
+    valor: parseMoeda(tr.querySelector('.c-valor').value),
     trEl: tr
   }));
   let totalCreditoCbs = 0, totalCreditoIbs = 0;
   creditos.forEach(c => {
     const credCbs = c.valor * cbsRegularRate;
-    const credIbs = c.valor * ibsTransRate;
+    const credIbs = c.valor * ibsRegularRate;
     totalCreditoCbs += credCbs;
     totalCreditoIbs += credIbs;
     c.trEl.querySelector('.c-cbs').textContent = 'R$ ' + fmt(credCbs);
     c.trEl.querySelector('.c-ibs').textContent = 'R$ ' + fmt(credIbs);
   });
+  const totalCustosEl = document.getElementById('totalCustosDespesas');
+  if (totalCustosEl) totalCustosEl.textContent = 'R$ ' + fmt(creditos.reduce((s, c) => s + c.valor, 0));
+  const totalCreditoCbsEl = document.getElementById('totalCreditoCbsFooter');
+  if (totalCreditoCbsEl) totalCreditoCbsEl.textContent = 'R$ ' + fmt(totalCreditoCbs);
+  const totalCreditoIbsEl = document.getElementById('totalCreditoIbsFooter');
+  if (totalCreditoIbsEl) totalCreditoIbsEl.textContent = 'R$ ' + fmt(totalCreditoIbs);
 
   const cbsAPagar = T2.cbsReg - totalCreditoCbs;
   const ibsAPagar = T2.ibsReg - totalCreditoIbs;
@@ -1012,22 +1093,19 @@ function calcular(){
   html += '<tr class="total-row"><td class="first">IBS a pagar' + (ibsAPagar<0?' (saldo credor a transportar)':'') + '</td><td class="' + (ibsAPagar<0?'pos':'neg') + '">R$ ' + fmt(ibsAPagar) + '</td></tr>';
   html += '</table>';
 
-  const deltaCarga1 = c1_total - c0_total;
-  const deltaCarga1Pct = c0_total !== 0 ? deltaCarga1 / c0_total : 0;
-  const deltaCarga2 = c2_total_liquido - c0_total;
-  const deltaCarga2Pct = c0_total !== 0 ? deltaCarga2 / c0_total : 0;
+  const ibsPctC2 = receitaTotal !== 0 ? T2.ibsReg / receitaTotal : 0;
+  const cbsPctC2 = receitaTotal !== 0 ? T2.cbsReg / receitaTotal : 0;
+  const deltaTotalC2vsC1 = c1_total !== 0 ? (c2_total_liquido - c1_total) / c1_total : 0;
 
   html += '<div class="section-title">4. Resumo Comparativo</div>';
   html += '<table class="plain resumo-table">';
-  html += '<tr><td class="first" style="width:55%">Receita Bruta Total do Mês (todas as atividades)</td><td>R$ ' + fmt(receitaTotal) + '</td></tr>';
-  html += '<tr><td class="first">Carga tributária total — 2026 (situação atual, referência)</td><td>R$ ' + fmt(c0_total) + '</td></tr>';
-  html += '<tr><td class="first">Carga tributária total — Cenário 1 (2027/2028, 100% Simples)</td><td>R$ ' + fmt(c1_total) + '</td></tr>';
-  html += '<tr><td class="first">&Delta; Cenário 1 &minus; 2026</td><td class="' + (deltaCarga1>=0?'neg':'pos') + '">R$ ' + fmt(deltaCarga1) + ' (' + fmtPct(deltaCarga1Pct) + ')</td></tr>';
-  html += '<tr><td class="first">Carga tributária total — Cenário 2 (líquida de créditos de insumos)</td><td>R$ ' + fmt(c2_total_liquido) + '</td></tr>';
-  html += '<tr><td class="first">&Delta; Cenário 2 &minus; 2026</td><td class="' + (deltaCarga2>=0?'neg':'pos') + '">R$ ' + fmt(deltaCarga2) + ' (' + fmtPct(deltaCarga2Pct) + ')</td></tr>';
-  html += '<tr><td class="first">Crédito ao adquirente PJ — Cenário 1</td><td>R$ ' + fmt(c1_credito) + '</td></tr>';
-  html += '<tr><td class="first">Crédito pleno ao adquirente PJ — Cenário 2 (débito bruto)</td><td>R$ ' + fmt(c2_credito) + '</td></tr>';
+  html += '<tr><td class="first" style="width:55%">Carga efetiva de IBS — Cenário 1 (embutido no Simples)</td><td>' + fmtPct(mediaIbsPct) + '</td></tr>';
+  html += '<tr><td class="first">Carga efetiva de CBS — Cenário 1 (embutido no Simples)</td><td>' + fmtPct(mediaCbsPct) + '</td></tr>';
+  html += '<tr><td class="first">Carga efetiva de IBS — Cenário 2 (regime regular, líquida de créditos)</td><td>' + fmtPct(ibsPctC2) + '</td></tr>';
+  html += '<tr><td class="first">Carga efetiva de CBS — Cenário 2 (regime regular, líquida de créditos)</td><td>' + fmtPct(cbsPctC2) + '</td></tr>';
+  html += '<tr class="total-row"><td class="first">Variação da carga tributária total — Cenário 2 em relação ao Cenário 1</td><td class="' + (deltaTotalC2vsC1>=0?'neg':'pos') + '">' + (deltaTotalC2vsC1>=0?'+':'') + fmtPct(deltaTotalC2vsC1) + '</td></tr>';
   html += '</table>';
+  html += '<div class="note">Valores totais de referência: IBS Cenário 1 R$ ' + fmt(T1.ibs) + ' · CBS Cenário 1 R$ ' + fmt(T1.cbs) + ' · IBS Cenário 2 R$ ' + fmt(T2.ibsReg) + ' · CBS Cenário 2 R$ ' + fmt(T2.cbsReg) + ' · Carga tributária total Cenário 1 R$ ' + fmt(c1_total) + ' · Carga tributária total Cenário 2 (líquida de créditos) R$ ' + fmt(c2_total_liquido) + '.</div>';
   html += '<div class="note" style="margin-top:10px;">Simulação de referência gerencial. Alíquotas de CBS/IBS do regime regular ainda pendentes de fixação definitiva pelo Senado Federal. Reduções por CNAE são indicativas — confirme o enquadramento exato antes de aplicar.</div>';
 
   resEl.innerHTML = html;
@@ -1038,15 +1116,18 @@ function calcular(){
 const BASE_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
 /*BOOTSTRAP_START*/
-adicionarLinha('Serviços contábeis - mercado interno', '6920-6/02', 'III', 171390.72, 'Nao');
-adicionarLinha('Serviços contábeis - mercado externo (exportação)', '6920-6/02', 'III', 75388.66, 'Sim');
-adicionarCredito('Aluguel comercial', 8000);
-adicionarCredito('Energia elétrica', 1500);
-adicionarCredito('Telecomunicações / Internet', 900);
-adicionarCredito('Serviços de terceiros (PJ)', 5000);
-adicionarCredito('Software e licenças', 1200);
-adicionarCredito('Material de escritório', 400);
+document.getElementById('razao').value = "";
+document.getElementById('cnpj').value = "";
+document.getElementById('cnaePrincipal').value = "";
+document.getElementById('rbt12int').value = "";
+document.getElementById('rbt12ext').value = "";
+document.getElementById('folha12').value = "";
+document.getElementById('cbsRegular').value = "";
+document.getElementById('ibsRegularEstadual').value = "";
+document.getElementById('ibsRegularMunicipal').value = "";
+document.getElementById('receitaComTributo').value = "Sim";
 atualizaFatorR();
+atualizaIbsRegularTotal();
 calcular();
 /*BOOTSTRAP_END*/
 
@@ -1062,7 +1143,8 @@ function capturarEstado(){
     rbt12ext: document.getElementById('rbt12ext').value,
     folha12: document.getElementById('folha12').value,
     cbsRegular: document.getElementById('cbsRegular').value,
-    ibsTransicao: document.getElementById('ibsTransicao').value,
+    ibsRegularEstadual: document.getElementById('ibsRegularEstadual').value,
+    ibsRegularMunicipal: document.getElementById('ibsRegularMunicipal').value,
     receitaComTributo: document.getElementById('receitaComTributo').value,
     linhas: Array.from(document.querySelectorAll('#linhasBody tr')).map(tr => ({
       desc: tr.querySelector('.l-desc').value,
@@ -1089,13 +1171,19 @@ function limparTudo(){
   document.getElementById('rbt12ext').value = '';
   document.getElementById('folha12').value = '';
   document.getElementById('cbsRegular').value = '';
-  document.getElementById('ibsTransicao').value = '';
+  document.getElementById('ibsRegularEstadual').value = '';
+  document.getElementById('ibsRegularMunicipal').value = '';
   document.getElementById('receitaComTributo').value = 'Sim';
   document.getElementById('linhasBody').innerHTML = '';
   document.getElementById('creditosBody').innerHTML = '';
   document.getElementById('resultado').innerHTML = '';
   document.getElementById('criticaAnexo').innerHTML = '';
+  document.getElementById('totalReceitaBrutaMes').textContent = 'R$ 0,00';
+  document.getElementById('totalCustosDespesas').textContent = 'R$ 0,00';
+  document.getElementById('totalCreditoCbsFooter').textContent = 'R$ 0,00';
+  document.getElementById('totalCreditoIbsFooter').textContent = 'R$ 0,00';
   atualizaFatorR();
+  atualizaIbsRegularTotal();
 }
 
 function desfazer(){
@@ -1111,13 +1199,15 @@ function desfazer(){
   document.getElementById('rbt12ext').value = estado.rbt12ext;
   document.getElementById('folha12').value = estado.folha12;
   document.getElementById('cbsRegular').value = estado.cbsRegular;
-  document.getElementById('ibsTransicao').value = estado.ibsTransicao;
+  document.getElementById('ibsRegularEstadual').value = estado.ibsRegularEstadual;
+  document.getElementById('ibsRegularMunicipal').value = estado.ibsRegularMunicipal;
   document.getElementById('receitaComTributo').value = estado.receitaComTributo || 'Sim';
   document.getElementById('linhasBody').innerHTML = '';
   document.getElementById('creditosBody').innerHTML = '';
-  estado.linhas.forEach(l => adicionarLinha(l.desc, l.cnae, l.anexo, parseFloat(l.receita) || 0, l.exportacao, parseFloat(l.redutor) || 0, l.regimeEspecial));
-  estado.creditos.forEach(c => adicionarCredito(c.desc, parseFloat(c.valor) || 0));
+  estado.linhas.forEach(l => adicionarLinha(l.desc, l.cnae, l.anexo, parseMoeda(l.receita), l.exportacao, parseFloat(l.redutor) || 0, l.regimeEspecial));
+  estado.creditos.forEach(c => adicionarCredito(c.desc, parseMoeda(c.valor)));
   atualizaFatorR();
+  atualizaIbsRegularTotal();
   calcular();
   ultimoEstado = null;
 }
@@ -1126,7 +1216,7 @@ function salvarArquivo(){
   let nome = (document.getElementById('razao').value || 'Cliente').trim();
   nome = nome.replace(/[^a-zA-Z0-9À-ÿ _-]/g, '').replace(/\s+/g, '_');
   if (!nome) nome = 'Cliente';
-  const filename = 'Simulador_IBS_CBS_' + nome + '.html';
+  const filename = 'Simulador IBS CBS Simples Nacional - versão do cliente (' + nome + ').html';
 
   let bootstrap = '\n';
   bootstrap += "document.getElementById('razao').value = " + JSON.stringify(document.getElementById('razao').value) + ";\n";
@@ -1136,7 +1226,8 @@ function salvarArquivo(){
   bootstrap += "document.getElementById('rbt12ext').value = " + JSON.stringify(document.getElementById('rbt12ext').value) + ";\n";
   bootstrap += "document.getElementById('folha12').value = " + JSON.stringify(document.getElementById('folha12').value) + ";\n";
   bootstrap += "document.getElementById('cbsRegular').value = " + JSON.stringify(document.getElementById('cbsRegular').value) + ";\n";
-  bootstrap += "document.getElementById('ibsTransicao').value = " + JSON.stringify(document.getElementById('ibsTransicao').value) + ";\n";
+  bootstrap += "document.getElementById('ibsRegularEstadual').value = " + JSON.stringify(document.getElementById('ibsRegularEstadual').value) + ";\n";
+  bootstrap += "document.getElementById('ibsRegularMunicipal').value = " + JSON.stringify(document.getElementById('ibsRegularMunicipal').value) + ";\n";
   bootstrap += "document.getElementById('receitaComTributo').value = " + JSON.stringify(document.getElementById('receitaComTributo').value) + ";\n";
 
   Array.from(document.querySelectorAll('#linhasBody tr')).forEach(tr => {
@@ -1144,7 +1235,7 @@ function salvarArquivo(){
       JSON.stringify(tr.querySelector('.l-desc').value) + ',' +
       JSON.stringify(tr.querySelector('.l-cnae').value) + ',' +
       JSON.stringify(tr.querySelector('.l-anexo').value) + ',' +
-      JSON.stringify(parseFloat(tr.querySelector('.l-receita').value) || 0) + ',' +
+      JSON.stringify(parseMoeda(tr.querySelector('.l-receita').value)) + ',' +
       JSON.stringify(tr.querySelector('.l-exp').value) + ',' +
       JSON.stringify(parseFloat(tr.querySelector('.l-redutor').value) || 0) + ',' +
       JSON.stringify(tr.querySelector('.l-regime').value) +
@@ -1153,10 +1244,10 @@ function salvarArquivo(){
   Array.from(document.querySelectorAll('#creditosBody tr')).forEach(tr => {
     bootstrap += 'adicionarCredito(' +
       JSON.stringify(tr.querySelector('.c-desc').value) + ',' +
-      JSON.stringify(parseFloat(tr.querySelector('.c-valor').value) || 0) +
+      JSON.stringify(parseMoeda(tr.querySelector('.c-valor').value)) +
       ');\n';
   });
-  bootstrap += 'atualizaFatorR();\ncalcular();\n';
+  bootstrap += 'atualizaFatorR();\natualizaIbsRegularTotal();\ncalcular();\n';
 
   const novoHtml = BASE_HTML.replace(
     /\/\*BOOTSTRAP_START\*\/[\s\S]*?\/\*BOOTSTRAP_END\*\//,
@@ -1173,6 +1264,4 @@ function salvarArquivo(){
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-</script>
-</body>
-</html>
+</script></body></html>
