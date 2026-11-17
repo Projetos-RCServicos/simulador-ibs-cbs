@@ -1106,7 +1106,73 @@ function calcular(){
   html += '<div class="note">Valores totais de referência: IBS Cenário 1 R$ ' + fmt(T1.ibs) + ' · CBS Cenário 1 R$ ' + fmt(T1.cbs) + ' · IBS Cenário 2 R$ ' + fmt(T2.ibsReg) + ' · CBS Cenário 2 R$ ' + fmt(T2.cbsReg) + ' · Carga tributária total Cenário 1 R$ ' + fmt(c1_total) + ' · Carga tributária total Cenário 2 (líquida de créditos) R$ ' + fmt(c2_total_liquido) + '.</div>';
   html += '<div class="note" style="margin-top:10px;">Simulação de referência gerencial. Alíquotas de CBS/IBS do regime regular ainda pendentes de fixação definitiva pelo Senado Federal. Reduções por CNAE são indicativas — confirme o enquadramento exato antes de aplicar.</div>';
 
+  const pctCreditoC1 = mediaCbsPct + mediaIbsPct;
+  const pctAumentoBruto = receitaTotal !== 0 ? (c2_total_bruto - c1_total) / receitaTotal : 0;
+  const pctAumentoLiquido = receitaTotal !== 0 ? (c2_total_liquido - c1_total) / receitaTotal : 0;
+
+  html += '<div class="section-title">5. Texto a ser enviado pela R&C ao cliente</div>';
+  html += '<div class="box" id="textoCliente" style="white-space:pre-wrap;font-family:inherit;line-height:1.6;">' + montarTextoCliente(pctCreditoC1, receitaTotal, pctAumentoBruto, pctAumentoLiquido) + '</div>';
+  html += '<div class="toolbar" style="border-top:none;padding-top:6px;"><button class="small" onclick="copiarTextoCliente()">📋 Copiar Texto</button></div>';
+
   resEl.innerHTML = html;
+}
+
+function fmtPct1(v){
+  return (v*100).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2}) + '%';
+}
+
+function montarTextoCliente(pctCreditoC1, mediaMensal, pctAumentoBruto, pctAumentoLiquido){
+  const p1 = fmtPct1(pctCreditoC1);
+  const pBruto = fmtPct1(pctAumentoBruto);
+  const pLiquido = fmtPct1(pctAumentoLiquido);
+  const media = 'R$ ' + fmt(mediaMensal);
+  const linhas = [
+    'Prezado .....,',
+    'Por gentileza avaliar o conteúdo do e-mail abaixo e nos responder até dia 25/09/2026.',
+    'Com a Reforma Tributária, as empresas optantes pelo Simples Nacional poderão escolher entre manter o IBS e a CBS dentro do próprio Simples Nacional ou recolher esses dois tributos separadamente, pelo regime regular.',
+    '1. Simples Nacional Tradicional (Simples Atual)',
+    'A empresa permanece no Simples Nacional da forma tradicional, com IBS e CBS recolhidos dentro do DAS. Nesse caso, os clientes da sua empresa que estiverem no regime regular (não cumulativo) poderão aproveitar como crédito apenas os valores de IBS e CBS efetivamente devidos por sua empresa no Simples Nacional puro.',
+    '2. Simples Nacional Híbrido | Regular',
+    'A empresa continua no Simples Nacional para os demais tributos, mas passa a apurar e recolher IBS e CBS separadamente, pelo regime regular.',
+    'Nesse modelo, o IBS e a CBS serão apurados pela sistemática não cumulativa, considerando débitos sobre as vendas e créditos admitidos sobre as aquisições.',
+    'Com isso, os clientes sujeitos ao regime regular poderão, observadas as regras aplicáveis, aproveitar integralmente os créditos de IBS e CBS relativos às operações.',
+    'Em contrapartida, essa opção poderá representar aumento da carga tributária para sua empresa.',
+    '3. Simulação da sua Empresa',
+    'Junto com esta comunicação, sua empresa está recebendo uma simulação em PDF, elaborada com base na receita bruta acumulada nos últimos 12 meses.',
+    'Com base nessa simulação:',
+    '• Permanecendo no Simples Nacional tradicional (Simples Atual): o crédito médio estimado de IBS/CBS que poderá ser apropriado pelos clientes da sua empresa, será de aproximadamente ' + p1 + ' considerando uma média mensal de ' + media + '.',
+    '• Optando pelo Simples Nacional híbrido | regular: os demais tributos permanecerão sujeitos às regras do Simples Nacional, enquanto IBS e CBS passarão a ser apurados pelo regime regular. Conforme a simulação, essa opção poderá representar um aumento estimado de ' + pBruto + ' na carga tributária da empresa, considerando uma média mensal de faturamento ' + media + '. Se optar pelo novo regime Simples Nacional Híbrido, deverá repassar para o cliente ou assumir um aumento de carga tributária de ' + pLiquido + ', considerando a média da receita mensal acima.',
+    'Esses valores têm caráter estimativo e servem para proporcionar uma visualização dos possíveis impactos de cada alternativa.',
+    'Além do PDF, estamos encaminhando o simulador, que poderá ser preenchido pela própria empresa, conforme link: RC Servicos de Contabilidade e Consultoria | Portão. Assim, caso a expectativa de receita para 2027 seja diferente daquela verificada nos últimos 12 meses, poderão ser informados outros valores para realizar novas projeções e comparar os resultados.',
+    '4. O que recomendamos avaliar?',
+    'A decisão não deve considerar somente a carga tributária da sua empresa. Também é importante avaliar o impacto dos créditos de IBS e CBS para seus clientes.',
+    'Se a empresa alterar para o modelo híbrido | regular (não cumulativo), conforme a simulação realizada, representaria um aumento estimado de ' + pLiquido + ' em sua carga tributária, entendemos que é necessário repassar na renegociação dos preços praticados pela empresa.',
+    'A escolha entre permanecer no Simples Nacional tradicional ou adotar o modelo híbrido cabe à própria empresa. Nosso objetivo é fornecer as informações e ferramentas necessárias para auxiliar nessa avaliação.',
+    '5. Prazo para a Decisão',
+    'Para o primeiro semestre de 2027, a opção pelo recolhimento do IBS e da CBS pelo regime regular deverá ser realizada até 30/09/2026.',
+    'A opção é semestral e, para esse primeiro período, poderá ser cancelada até 30/11/2026. Recomendamos que sua empresa comunique seus clientes sobre a opção tomada.',
+    'Importante: Esperamos para enviar o email, considerando que a alíquota de referência da CBS aplicável em 2027 ainda não foi definitivamente fixada pelo Governo Federal. Porém devido à complexidade do tema e para fins das simulações apresentadas, estamos considerando uma estimativa entre 8,8% e 9,3%, que poderá ser alterada quando houver a definição oficial da alíquota.',
+    'Dessa forma, os resultados apresentados no PDF e aqueles obtidos por meio do simulador devem ser considerados estimativas para auxiliar na tomada de decisão, podendo sofrer alterações em razão da alíquota definitiva da CBS e dos dados efetivamente realizados pela empresa em 2027.',
+    'A escolha entre permanecer no Simples Nacional tradicional ou adotar o modelo híbrido cabe à própria empresa, considerando os impactos tributários e comerciais de cada alternativa.',
+    'Pedimos para que a decisão seja tomada nos próximos 10 dias, nos informando qual a opção desejada até 25/09/2026.'
+  ];
+  return linhas.join('\n\n');
+
+}
+
+function copiarTextoCliente(){
+  const el = document.getElementById('textoCliente');
+  if (!el) return;
+  const texto = el.textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(texto).then(function(){
+      alert('Texto copiado para a área de transferência.');
+    }, function(){
+      alert('Não foi possível copiar automaticamente. Selecione o texto manualmente.');
+    });
+  } else {
+    alert('Não foi possível copiar automaticamente. Selecione o texto manualmente.');
+  }
 }
 
 // Captura o HTML "de fábrica" (com as tabelas ainda vazias) para servir de base ao botão "Salvar Arquivo do Cliente".
@@ -1114,16 +1180,17 @@ function calcular(){
 const BASE_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
 /*BOOTSTRAP_START*/
-document.getElementById('razao').value = "";
-document.getElementById('cnpj').value = "";
+document.getElementById('razao').value = "FUROTOP";
+document.getElementById('cnpj').value = "23157544000167";
 document.getElementById('cnaePrincipal').value = "";
-document.getElementById('rbt12int').value = "";
-document.getElementById('rbt12ext').value = "";
+document.getElementById('rbt12int').value = "R$ 2.292.608,27";
+document.getElementById('rbt12ext').value = "R$ 0,00";
 document.getElementById('folha12').value = "";
-document.getElementById('cbsRegular').value = "";
-document.getElementById('ibsRegularEstadual').value = "";
-document.getElementById('ibsRegularMunicipal').value = "";
+document.getElementById('cbsRegular').value = "9.1";
+document.getElementById('ibsRegularEstadual').value = "8.85";
+document.getElementById('ibsRegularMunicipal').value = "8.85";
 document.getElementById('receitaComTributo').value = "Sim";
+adicionarLinha("","","IV",22472.19,"Nao",0,"icms");
 atualizaFatorR();
 atualizaIbsRegularTotal();
 calcular();
